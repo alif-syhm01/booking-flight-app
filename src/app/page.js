@@ -138,7 +138,7 @@ export default function Home() {
   async function getAirports(airport_name = '') {
     const { data, error } = await supabase
       .from('airports')
-      .select('id, name, iata_code, location')
+      .select('id, name, iata_code, cities(city_name, country_name)')
       .ilike('name', `%${airport_name}%`);
 
     if (error === null) setListAirports(data);
@@ -346,7 +346,7 @@ export default function Home() {
                               key={airport.id}
                               className='cursor-pointer px-7 hover:bg-slate-100'
                               onClick={selectedDepartureAirport.bind({
-                                cityName: airport.location.split(' - ')[0],
+                                cityName: airport.cities.city_name,
                                 iataCode: airport.iata_code,
                               })}
                             >
@@ -360,9 +360,7 @@ export default function Home() {
                                 />
                                 <div className='ml-4'>
                                   <h6 className='text-lg font-bold'>
-                                    {`${airport.location.split(' - ')[0]}, ${
-                                      airport.location.split(' - ')[1]
-                                    }`}
+                                    {`${airport.cities.city_name}, ${airport.cities.country_name}`}
                                   </h6>
                                   <p className='text-base text-slate-600'>
                                     {airport.name
@@ -447,7 +445,7 @@ export default function Home() {
                               key={airport.id}
                               className='cursor-pointer px-7 hover:bg-slate-100'
                               onClick={selectedArriveAirport.bind({
-                                cityName: airport.location.split(' - ')[0],
+                                cityName: airport.cities.city_name,
                                 iataCode: airport.iata_code,
                               })}
                             >
@@ -461,9 +459,7 @@ export default function Home() {
                                 />
                                 <div className='ml-4'>
                                   <h6 className='text-lg font-bold'>
-                                    {`${airport.location.split(' - ')[0]}, ${
-                                      airport.location.split(' - ')[1]
-                                    }`}
+                                    {`${airport.cities.city_name}, ${airport.cities.country_name}`}
                                   </h6>
                                   <p className='text-base text-slate-600'>
                                     {airport.name
@@ -500,9 +496,9 @@ export default function Home() {
                     onOpenChange={(openDepartureDatePicker) =>
                       setOpenDepartureDatePicker(openDepartureDatePicker)
                     }
-                    disabledDate={(value) =>
-                      value && value < new Date(new Date().setHours(0, 0, 0, 0))
-                    }
+                    // disabledDate={(value) =>
+                    //   value && value < new Date(new Date().setHours(0, 0, 0, 0))
+                    // }
                     onChange={onChangeDepartureDate}
                   />
                   <div
@@ -664,7 +660,7 @@ export default function Home() {
                     arrival: arriveAirport,
                     departure_date: currentDate.toISOString().slice(0, 10),
                     ...(checked && {
-                      arrive_date: nextDate.toISOString().slice(0, 10),
+                      return_date: nextDate.toISOString().slice(0, 10),
                     }),
                     adult: countAdult,
                     children: countChild,
